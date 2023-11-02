@@ -71,7 +71,7 @@ CREATE TABLE Skill (
 CREATE TABLE Skill_Player (
   playerId serial REFERENCES Player(playerId),
   skillId serial REFERENCES Skill(skillId),
-  killCounter INTEGER
+  killCounter INTEGER DEFAULT 0
 );
 
 CREATE TABLE Floor (
@@ -134,6 +134,7 @@ BEGIN
       INSERT INTO Inventory_Item (inventoryId, itemId)
       VALUES ((SELECT inventoryId FROM Player WHERE playerId = NEW.playerId), (SELECT drop_item FROM boss WHERE bossid=NEW.bossid));
       UPDATE boss SET status='Мёртв' WHERE bossid=NEW.bossid;
+      UPDATE Skill_Player SET killcounter=killcounter+1 WHERE playerId=NEW.playerId;
     ELSE
       UPDATE player SET status='Мёртв' WHERE playerid=NEW.playerId;
     END IF;
@@ -157,6 +158,7 @@ BEGIN
       INSERT INTO Inventory_Item (inventoryId, itemId)
       VALUES ((SELECT inventoryId FROM Player WHERE playerId = NEW.playerId), (SELECT drop_item FROM mob WHERE mobid=(SELECT mobid FROM existmobs WHERE exmobid=NEW.exmobid)));
       UPDATE existmobs SET status='Мёртв' WHERE exmobId=NEW.exmobId;
+      UPDATE Skill_Player SET killcounter=killcounter+1 WHERE playerId=NEW.playerId;
     ELSE
       UPDATE player SET status='Мёртв' WHERE playerid=NEW.playerId;
     END IF;
